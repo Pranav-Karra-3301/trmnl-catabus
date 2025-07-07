@@ -1,0 +1,11 @@
+{
+  "description": "Rules for CATA→TRMNL micro-service",
+  "rules": [
+    "Always use TypeScript.",
+    "Edge runtime only; each app/api handler exports config.runtime='edge'.",
+    "Never commit .env.local; use .env.example.",
+    "Responses must include Cache-Control headers.",
+    "Use gtfs-realtime-bindings for parsing protobuf.",
+    "Return only route, headsign, time, and status fields."
+  ]
+}
