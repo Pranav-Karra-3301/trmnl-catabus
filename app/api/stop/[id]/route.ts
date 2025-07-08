@@ -1,4 +1,4 @@
-import { get } from '@vercel/edge-config';
+import kv from '@/lib/kv';
 
 export const config = { runtime: 'edge' };
 
@@ -8,9 +8,9 @@ export async function GET(
 ) {
   const { id: stopId } = await params;
   console.log(`[stop] Fetching data for stop ${stopId}`);
-  
+
   try {
-    const json = await get(`stop:${stopId}`);
+    const json = await kv.get(`stop:${stopId}`);
     console.log(`[stop] Got data for stop ${stopId}:`, json ? 'found' : 'not found');
 
     if (json === undefined) {

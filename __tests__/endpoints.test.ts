@@ -34,6 +34,20 @@ jest.mock('@vercel/edge-config', () => ({
   }),
 }));
 
+jest.mock('@/lib/kv', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(async (key: string) => store.get(key)),
+    set: jest.fn(async (key: string, value: unknown) => {
+      store.set(key, value);
+    }),
+    keys: jest.fn(async (pattern: string) => {
+      const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
+      return Array.from(store.keys()).filter((k) => regex.test(k));
+    }),
+  },
+}));
+
 jest.mock('@/lib/cata', () => ({
   fetchFeed: jest.fn().mockResolvedValue(
     new Map([
