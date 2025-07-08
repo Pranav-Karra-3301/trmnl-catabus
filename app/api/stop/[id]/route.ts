@@ -36,8 +36,9 @@ export async function GET(
     );
   }
 
-  const obj = JSON.parse(raw as string);
-  console.log('[stop-api] returning payload bytes:', raw.length);
+  const str = raw as string;
+  const obj = JSON.parse(str);
+  console.log('[stop-api] returning payload bytes:', str.length);
   return new Response(JSON.stringify(obj), {
     status: 200,
     headers: {

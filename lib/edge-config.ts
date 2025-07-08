@@ -4,7 +4,7 @@ const TOKEN = process.env.VERCEL_TOKEN!;
 const STORE_ID = process.env.EDGE_CONFIG!;
 const API = `https://api.vercel.com/v1/edge-config/${STORE_ID}/items`;
 
-export async function writeItems(items: { key: string; value: any }[]) {
+export async function writeItems(items: { key: string; value: unknown }[]) {
   await fetch(`${API}`, {
     method: 'PATCH',
     headers: {

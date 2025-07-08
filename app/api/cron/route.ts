@@ -1,5 +1,5 @@
 import { fetchFeed } from '@/lib/cata';
-import { writeItems } from '../../../lib/edge-config';
+import { writeItems } from '@/lib/edge-config';
 
 export const config = { runtime: 'edge' };
 
@@ -9,7 +9,7 @@ export async function GET() {
     console.log('[cron] Fetching latest CATA feed');
     const feed = await fetchFeed();
 
-    const items: { key: string; value: any }[] = [];
+    const items: { key: string; value: unknown }[] = [];
 
     for (const [stopId, departures] of feed.entries()) {
       items.push({

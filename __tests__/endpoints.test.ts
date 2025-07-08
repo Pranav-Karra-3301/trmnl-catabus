@@ -21,6 +21,19 @@ jest.mock('@/lib/edge-config', () => ({
   }),
 }));
 
+// Mock the direct edge-config SDK to point to the same in-memory store
+jest.mock('@vercel/edge-config', () => ({
+  __esModule: true,
+  get: jest.fn(async (key: string) => store.get(key)),
+  getAll: jest.fn(async () => {
+    const obj: Record<string, string> = {};
+    store.forEach((v, k) => {
+      obj[k] = v;
+    });
+    return obj;
+  }),
+}));
+
 jest.mock('@/lib/cata', () => ({
   fetchFeed: jest.fn().mockResolvedValue(
     new Map([
