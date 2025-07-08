@@ -11,6 +11,7 @@ Output format:
 
 import argparse
 import datetime as dt
+import json
 import logging
 import os  # new dependency for REDIS_URL environment variable
 import sys
@@ -22,6 +23,11 @@ try:
     import requests
 except ImportError:
     requests = None  # we'll complain later
+
+try:
+    import redis
+except ImportError:
+    redis = None  # we'll complain later
 
 try:
     from google.transit import gtfs_realtime_pb2
@@ -103,26 +109,26 @@ def extract_departures(feed, stop_id: str, top_n: int = 8) -> List[dict]:
 
 # ---------- redis helper ----------
 
-# The Python runtime on Vercel (and locally) exposes the Upstash Redis REST URL via the
+# The Python runtime on Vercel (and locally) exposes the Redis connection string via the
 # REDIS_URL environment variable. We push the departures list under the key `stop:<id>`
-# using a simple HTTP PUT request.
+# using the redis-py client.
 
 def push_to_redis(stop_id: str, departures: List[dict], redis_url: str) -> None:
-    """Push departure payload to Redis. Logs success/failure. Raises on HTTP errors."""
-    if not requests:
-        logging.warning("The requests library is not installed; skipping Redis push.")
+    """Push departure payload to Redis. Logs success/failure. Raises on Redis errors."""
+    if not redis:
+        logging.warning("The redis library is not installed; skipping Redis push.")
         return
 
-    key_url = f"{redis_url.rstrip('/')}/stop:{stop_id}"
+    client = redis.from_url(redis_url, decode_responses=True)
+    key = f"stop:{stop_id}"
     payload = {
-        "updatedAt": dt.datetime.utcnow().isoformat() + "Z",
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "departures": departures,
     }
 
-    logging.info("PUT %s (len=%d)", key_url, len(departures))
-    r = requests.put(key_url, json=payload, timeout=10)
-    r.raise_for_status()
-    logging.info("✓ Redis push successful: status=%s", r.status_code)
+    logging.info("SET %s (len=%d)", key, len(departures))
+    client.set(key, json.dumps(payload))   # atomic overwrite every 5 min
+    logging.info("✓ Redis push successful")
 
 # ---------- CLI ----------
 

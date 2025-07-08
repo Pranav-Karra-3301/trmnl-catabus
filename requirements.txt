@@ -1,4 +1,5 @@
 protobuf
 gtfs-realtime-bindings
 requests
+redis>=5.0
 zoneinfo;python_version<"3.9" 

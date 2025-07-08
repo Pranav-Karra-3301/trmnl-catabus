@@ -25,7 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install protobuf gtfs-realtime-bindings requests
+          pip install protobuf gtfs-realtime-bindings requests redis
 
       - name: Fetch and push departures
         # Note: gtfs_departures.py now pushes directly to Vercel KV via REST
