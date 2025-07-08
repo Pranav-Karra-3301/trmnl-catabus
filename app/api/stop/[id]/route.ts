@@ -1,4 +1,4 @@
-import { cache } from '@/lib/cache';
+import { get } from '@vercel/edge-config';
 
 export const config = { runtime: 'edge' };
 
@@ -16,32 +16,33 @@ export async function GET(
         status: 400,
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=10, stale-while-revalidate=20',
+          'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
         },
       }
     );
   }
 
-  const json = cache.get(stopId);
-  if (!json) {
+  const raw = await get(`stop:${stopId}`);
+  if (raw === undefined) {
     return new Response(
       JSON.stringify({ error: 'no-data' }),
       {
         status: 503,
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=10, stale-while-revalidate=20',
+          'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
         },
       }
     );
   }
 
-  console.log('[stop-api] returning payload bytes:', json.length);
-  return new Response(json, {
+  const obj = JSON.parse(raw as string);
+  console.log('[stop-api] returning payload bytes:', raw.length);
+  return new Response(JSON.stringify(obj), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=10, stale-while-revalidate=20',
+      'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
     },
   });
 }

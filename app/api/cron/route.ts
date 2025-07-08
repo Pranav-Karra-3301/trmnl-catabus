@@ -1,5 +1,5 @@
 import { fetchFeed } from '@/lib/cata';
-import { cache } from '@/lib/cache';
+import { writeItems } from '../../../lib/edge-config';
 
 export const config = { runtime: 'edge' };
 
@@ -9,26 +9,29 @@ export async function GET() {
     console.log('[cron] Fetching latest CATA feed');
     const feed = await fetchFeed();
 
+    const items: { key: string; value: any }[] = [];
+
     for (const [stopId, departures] of feed.entries()) {
-      const payload = JSON.stringify({
-        updatedAt: new Date().toISOString(),
-        departures,
+      items.push({
+        key: `stop:${stopId}`,
+        value: {
+          updatedAt: new Date().toISOString(),
+          departures,
+        },
       });
-      cache.set(stopId, payload);
     }
 
-    console.log('[cron] Stops cached:', cache.getAllStopIds().slice(0, 20));
-    console.log(`[cron] Completed in ${Date.now() - start}ms – total stops: ${cache.size()}`);
+    await writeItems(items);
+
+    console.log('[cron] wrote stops to Edge Config:', items.length);
+    console.log(`[cron] Completed in ${Date.now() - start}ms`);
 
     return new Response(null, { status: 204 });
   } catch (err) {
     console.error('[cron] Error:', err);
-    return new Response(
-      JSON.stringify({ error: 'cron-failed' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: 'cron-failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

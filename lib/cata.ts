@@ -118,7 +118,7 @@ function parseXmlFeed(xml: string): Map<string, Departure[]> {
 
 // Publicly available CATA real-time feed URL (GTFS-RT TripUpdate).
 const CATA_RT_URL =
-  'http://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate';
+  'http://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?&Type=TripUpdate';
 
 /**
  * Fetch CATA's real-time feed, attempting protobuf first with an XML fallback.
