@@ -10,11 +10,5 @@
       "src": "/api/gtfs_departures",
       "dest": "gtfs_departures.py"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron.py",
-      "schedule": "*/5 * * * *"
-    }
   ]
 } 
