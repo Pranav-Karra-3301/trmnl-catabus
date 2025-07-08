@@ -4,9 +4,9 @@ export const config = { runtime: 'edge' };
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: stopId } = params;
+  const { id: stopId } = await params;
   const json = await get(`stop:${stopId}`);
 
   if (json === undefined) {

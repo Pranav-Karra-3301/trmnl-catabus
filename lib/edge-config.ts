@@ -4,7 +4,7 @@ const STORE = process.env.EDGE_CONFIG!;
 const TOKEN = process.env.VERCEL_TOKEN!;
 const API = `https://api.vercel.com/v1/edge-config/${STORE}/items`;
 
-export async function upsert(items: { key: string; value: any }[]) {
+export async function upsert(items: { key: string; value: unknown }[]) {
   await fetch(API, {
     method: 'PATCH',
     headers: {

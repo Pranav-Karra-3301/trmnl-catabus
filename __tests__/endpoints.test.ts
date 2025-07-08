@@ -6,14 +6,14 @@ const store = new Map<string, unknown>();
 
 jest.mock('@/lib/edge-config', () => ({
   __esModule: true,
-  upsert: jest.fn(async (items: { key: string; value: any }[]) => {
+  upsert: jest.fn(async (items: { key: string; value: unknown }[]) => {
     items.forEach(({ key, value }) => {
       store.set(key, value);
     });
   }),
   get: jest.fn(async (key: string) => store.get(key)),
   getAll: jest.fn(async () => {
-    const obj: Record<string, any> = {};
+    const obj: Record<string, unknown> = {};
     store.forEach((v, k) => {
       obj[k] = v;
     });
@@ -26,7 +26,7 @@ jest.mock('@vercel/edge-config', () => ({
   __esModule: true,
   get: jest.fn(async (key: string) => store.get(key)),
   getAll: jest.fn(async () => {
-    const obj: Record<string, any> = {};
+    const obj: Record<string, unknown> = {};
     store.forEach((v, k) => {
       obj[k] = v;
     });
@@ -76,13 +76,13 @@ describe('API endpoints integration', () => {
     expect(stopsJson.stops).toEqual(expect.arrayContaining(['72', '99']));
 
     // 3. valid stop id
-    const stopValid = await stopGET({} as any, { params: { id: '72' } });
+    const stopValid = await stopGET({} as any, { params: Promise.resolve({ id: '72' }) });
     expect(stopValid.status).toBe(200);
     const payload = JSON.parse(await stopValid.text());
     expect(payload.departures).toHaveLength(1);
 
     // 4. invalid stop id
-    const stopInvalid = await stopGET({} as any, { params: { id: '000' } });
+    const stopInvalid = await stopGET({} as any, { params: Promise.resolve({ id: '000' }) });
     expect(stopInvalid.status).toBe(503);
   });
 }); 
