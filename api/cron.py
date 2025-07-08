@@ -1,11 +1,11 @@
 """Python Serverless Function: /api/cron.py
 Runs as a Vercel Cron Job every 5 minutes to fetch the latest CATA GTFS-Realtime
-feed and store parsed departures per stop in Edge Config. The data shape matches
+feed and store parsed departures per stop in Vercel KV (Redis). The data shape matches
 what /api/stop/[id] expects (see lib/types.d.ts).
 
 Environment variables required:
-  EDGE_CONFIG_ID – ID of the Edge Config store (read-write permissions)
-  VERCEL_TOKEN   – Vercel API token with access to the Edge Config
+  KV_REST_API_URL   – Vercel KV REST API URL
+  KV_REST_API_TOKEN – Vercel KV REST API token
 """
 
 from __future__ import annotations
@@ -27,12 +27,9 @@ from google.transit import gtfs_realtime_pb2
 LOCAL_TZ = ZoneInfo("America/New_York")
 
 # ---------------------------------------------------------------------------
-# Edge Config helpers
-EDGE_CONFIG_ID = os.environ.get("EDGE_CONFIG_ID")
-VERCEL_TOKEN = os.environ.get("VERCEL_TOKEN")
-EDGE_CONFIG_API = (
-    f"https://api.vercel.com/v1/edge-config/{EDGE_CONFIG_ID}/items" if EDGE_CONFIG_ID else None
-)
+# Vercel KV (Redis) helpers
+KV_REST_API_URL = os.environ.get("KV_REST_API_URL")
+KV_REST_API_TOKEN = os.environ.get("KV_REST_API_TOKEN")
 
 logger = logging.getLogger("cata-cron")
 logger.setLevel(logging.INFO)
@@ -93,41 +90,47 @@ def parse_departures(feed: "gtfs_realtime_pb2.FeedMessage") -> Dict[str, List[di
 
 
 # ---------------------------------------------------------------------------
-# Edge Config interaction
+# Vercel KV (Redis) interaction
 
-def upsert(items: List[Tuple[str, dict]]) -> None:
-    """PATCH items into Edge Config (same shape as TypeScript helper)."""
-
-    if not EDGE_CONFIG_API or not VERCEL_TOKEN:
+def set_kv_item(key: str, value: dict) -> None:
+    """Set a single item in Vercel KV (Redis)."""
+    
+    if not KV_REST_API_URL or not KV_REST_API_TOKEN:
         logger.warning(
-            "Missing EDGE_CONFIG_ID or VERCEL_TOKEN – skipping Edge Config update"
+            "Missing KV_REST_API_URL or KV_REST_API_TOKEN – skipping KV update"
         )
         return
 
-    payload = [
-        {
-            "operation": "upsert",
-            "key": key,
-            "value": value,
-        }
-        for key, value in items
-    ]
-
-    res = requests.patch(
-        EDGE_CONFIG_API,
+    url = f"{KV_REST_API_URL}/set/{key}"
+    
+    res = requests.post(
+        url,
         headers={
-            "Authorization": f"Bearer {VERCEL_TOKEN}",
+            "Authorization": f"Bearer {KV_REST_API_TOKEN}",
             "Content-Type": "application/json",
         },
-        json=payload,
+        json=value,
         timeout=10,
     )
 
     if not res.ok:
-        logger.error("Edge Config update failed: %s %s", res.status_code, res.text)
+        logger.error("KV set failed for key %s: %s %s", key, res.status_code, res.text)
         res.raise_for_status()
 
-    logger.info("✓ Edge Config updated (%d items)", len(items))
+def upsert_kv_batch(items: List[Tuple[str, dict]]) -> None:
+    """Update multiple items in Vercel KV (Redis)."""
+    
+    if not KV_REST_API_URL or not KV_REST_API_TOKEN:
+        logger.warning(
+            "Missing KV_REST_API_URL or KV_REST_API_TOKEN – skipping KV update"
+        )
+        return
+
+    # Vercel KV doesn't have a batch upsert, so we'll do individual sets
+    for key, value in items:
+        set_kv_item(key, value)
+
+    logger.info("✓ KV updated (%d items)", len(items))
 
 
 # ---------------------------------------------------------------------------
@@ -154,7 +157,7 @@ def handler(request):  # type: ignore[valid-type]
 
         logger.info("Prepared %d items for upsert", len(items))
         if items:
-            upsert(items)
+            upsert_kv_batch(items)
 
         return {
             "success": True,

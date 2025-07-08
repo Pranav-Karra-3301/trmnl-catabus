@@ -1,5 +1,5 @@
 import { fetchFeed } from '@/lib/cata';
-import { upsert } from '@/lib/edge-config';
+import kv from '@/lib/kv';
 
 export const config = { runtime: 'edge' };
 
@@ -25,10 +25,13 @@ export async function GET() {
     console.log('[cron] Prepared', items.length, 'items for upsert');
 
     try {
-      await upsert(items);
-      console.log('[cron] Upsert completed successfully');
+      // Use Redis (Vercel KV) to store the data
+      for (const item of items) {
+        await kv.set(item.key, item.value);
+      }
+      console.log('[cron] KV upsert completed successfully');
     } catch (upsertError) {
-      console.error('[cron] Upsert failed:', upsertError);
+      console.error('[cron] KV upsert failed:', upsertError);
       // Continue execution instead of failing completely
     }
 

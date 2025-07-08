@@ -89,22 +89,107 @@ def load_mapping(path: Path) -> Dict[str, str]:
     return mapping
 
 
-def extract_departures(feed, stop_id: str, top_n: int = 8) -> List[dict]:
-    deps: List[dict] = []
+def extract_all_departures(feed, top_n: int = 10) -> Dict[str, List[dict]]:
+    """Extract departures for all stops from the feed."""
+    per_stop: Dict[str, List[dict]] = {}
+    now_ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
+    
     for ent in feed.entity:
         if ent.HasField("trip_update"):
             tu = ent.trip_update
+            trip = tu.trip
+            route_id = trip.route_id or "??"
+            headsign = trip.trip_id or "Unknown"
+            
+            for stu in tu.stop_time_update:
+                stop_id = stu.stop_id
+                if not stop_id or not stu.departure.time:
+                    continue
+                
+                scheduled_ms = stu.departure.time * 1000
+                delay_s = stu.departure.delay if stu.departure.HasField("delay") else 0
+                predicted_ms = scheduled_ms + delay_s * 1000
+                
+                # Filter out clearly outdated/far-future departures
+                if predicted_ms < now_ms - 60_000:  # >1 min in the past
+                    continue
+                if predicted_ms > now_ms + 2 * 60 * 60 * 1000:  # >2h ahead
+                    continue
+                
+                status = (
+                    "delayed" if delay_s > 90 else "early" if delay_s < -90 else "on-time"
+                )
+                
+                dep = {
+                    "route": route_id,
+                    "headsign": headsign,
+                    "time": dt.datetime.fromtimestamp(predicted_ms / 1000, LOCAL_TZ).isoformat(),
+                    "status": status,
+                }
+                
+                per_stop.setdefault(stop_id, []).append(dep)
+    
+    # Sort and cap for each stop
+    for stop_id, deps in per_stop.items():
+        deps.sort(key=lambda d: d["time"])
+        per_stop[stop_id] = deps[:top_n]
+    
+    return per_stop
+
+
+def push_all_to_redis(departures_by_stop: Dict[str, List[dict]], redis_url: str) -> None:
+    """Push all stop departures to Redis."""
+    if not redis:
+        logging.warning("The redis library is not installed; skipping Redis push.")
+        return
+
+    client = redis.from_url(redis_url, decode_responses=True)
+    
+    for stop_id, departures in departures_by_stop.items():
+        key = f"stop:{stop_id}"
+        payload = {
+            "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "departures": departures,
+        }
+        
+        logging.info("SET %s (len=%d)", key, len(departures))
+        client.set(key, json.dumps(payload))
+    
+    logging.info("✓ Redis push successful for %d stops", len(departures_by_stop))
+    deps: List[dict] = []
+    now_ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
+    
+    for ent in feed.entity:
+        if ent.HasField("trip_update"):
+            tu = ent.trip_update
+            trip = tu.trip
+            route_id = trip.route_id or "??"
+            headsign = trip.trip_id or "Unknown"
+            
             for stu in tu.stop_time_update:
                 if stu.stop_id == stop_id and stu.departure.time:
-                    deps.append(
-                        {
-                            "trip_id": tu.trip.trip_id,
-                            "route_id": tu.trip.route_id,
-                            "ts": stu.departure.time,
-                            "delay": stu.departure.delay if stu.departure.HasField("delay") else None,
-                        }
+                    scheduled_ms = stu.departure.time * 1000
+                    delay_s = stu.departure.delay if stu.departure.HasField("delay") else 0
+                    predicted_ms = scheduled_ms + delay_s * 1000
+                    
+                    # Filter out clearly outdated/far-future departures
+                    if predicted_ms < now_ms - 60_000:  # >1 min in the past
+                        continue
+                    if predicted_ms > now_ms + 2 * 60 * 60 * 1000:  # >2h ahead
+                        continue
+                    
+                    status = (
+                        "delayed" if delay_s > 90 else "early" if delay_s < -90 else "on-time"
                     )
-    deps.sort(key=lambda d: d["ts"])
+                    
+                    deps.append({
+                        "route": route_id,
+                        "headsign": headsign,
+                        "time": dt.datetime.fromtimestamp(predicted_ms / 1000, LOCAL_TZ).isoformat(),
+                        "status": status,
+                    })
+    
+    deps.sort(key=lambda d: d["time"])
     return deps[:top_n]
 
 # ---------- redis helper ----------
@@ -135,8 +220,9 @@ def push_to_redis(stop_id: str, departures: List[dict], redis_url: str) -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description="Show upcoming departures for a stop.")
     p.add_argument("url", help="URL of the .ashx GTFS-Realtime feed")
-    p.add_argument("stop_id", help="Stop ID (e.g. 54)")
+    p.add_argument("stop_id", nargs="?", help="Stop ID (e.g. 54) or 'all' for all stops")
     p.add_argument("-n", "--number", type=int, default=8, help="How many departures to list (default 8)")
+    p.add_argument("--all", action="store_true", help="Process all stops and push to Redis")
     args = p.parse_args()
 
     try:
@@ -146,6 +232,29 @@ def main() -> None:
         logging.error("FAILED: %s", e, exc_info=True)
         sys.exit(1)
 
+    # Handle all stops mode
+    if args.all or (args.stop_id and args.stop_id.lower() == "all"):
+        departures_by_stop = extract_all_departures(feed, args.number)
+        
+        # Push to Redis if configured
+        redis_url = os.environ.get("REDIS_URL")
+        if redis_url:
+            try:
+                push_all_to_redis(departures_by_stop, redis_url)
+            except Exception as e:
+                logging.error("Redis push failed: %s", e, exc_info=True)
+                sys.exit(1)
+        else:
+            logging.warning("REDIS_URL not set; skipping Redis push")
+        
+        print(f"Processed {len(departures_by_stop)} stops")
+        return
+
+    # Handle single stop mode
+    if not args.stop_id:
+        print("Error: stop_id is required unless using --all flag")
+        sys.exit(1)
+        
     departures = extract_departures(feed, args.stop_id, args.number)
 
     # Attempt to push results to Redis, if a URL is configured.
@@ -170,10 +279,9 @@ def main() -> None:
     print(f"Next {len(departures)} departures at {stop_name}:")
 
     for d in departures:
-        time_str = dt.datetime.fromtimestamp(d["ts"], LOCAL_TZ).strftime("%H:%M:%S")
-        route    = route_map.get(d["route_id"], d["route_id"])
-        delay    = f"{d['delay']} s" if d["delay"] is not None else "n/a"
-        print(f" {time_str} | {route} | trip {d['trip_id']} | delay {delay}")
+        time_str = dt.datetime.strptime(d["time"], "%Y-%m-%dT%H:%M:%S%z").strftime("%H:%M:%S")
+        route = route_map.get(d["route"], d["route"])
+        print(f" {time_str} | {route} | {d['headsign']} | {d['status']}")
 
 
 if __name__ == "__main__":

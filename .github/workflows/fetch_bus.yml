@@ -28,6 +28,6 @@ jobs:
           pip install protobuf gtfs-realtime-bindings requests redis
 
       - name: Fetch and push departures
-        # Note: gtfs_departures.py now pushes directly to Vercel KV via REST
+        # Fetch all stops and push to Redis
         run: |
-          python gtfs_departures.py https://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate 54 --number 8
+          python gtfs_departures.py https://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate --all
