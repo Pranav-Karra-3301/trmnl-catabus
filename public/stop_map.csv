@@ -1,0 +1,327 @@
+stop_id,stop_name
+1,E. College Ave at S. Allen Street
+4,Pattee Transit Center Eastbound
+5,Hastings Rd at University Drive
+6,West Park Ave at North Burrowes St
+7,N Atherton St at Hillcrest Ave
+8,1101 N. Atherton St at CVS
+9,801 Toftrees Avenue - The Station
+15,801 W Aaron Dr at Park Forest Apartments
+16,1003 W Aaron Dr near State College Colle
+38,Waupelani Dr opposite Jaru Copy
+39,1100 W Aaron Dr at State College Collect
+40,720 W Aaron Dr at Aaron Village
+46,1224 N Atherton St - Discovery Space
+47,N Atherton St at Mitchell Ave Inbound
+48,N Atherton St at Mitchell Ave Inbound
+51,Curtin Rd at Pavilion Theatre
+52,E College Ave at Atherton Hall
+53,Bigler Rd at Computer Building
+54,Shortlidge Rd at White Building
+55,Pollock Rd at Millennium Science Cplx
+64,Waupelani Dr at Waupelani Lofts
+110,1001 University Dr
+111,University Dr at E. Waring Ave (SSA Office)
+112,University Dr at Bellaire Ave (Inbound)
+118,Trout Road at Pleasant Pointe
+147,Gerald St at Matthew Circle Outbound
+148,Curtin Rd at McCoy Natatorium
+149,Curtin Rd at Shields Building
+150,University Dr at the Pegula Ice Arena
+151,University Dr at Hastings Rd
+152,University Dr at Lot 83 West
+153,University Dr at Jordan Center Gate D
+154,Curtin Rd at the Intramural Building
+155,East Halls at Curtin Hall
+156,South Atherton at Creekside Plaza
+157,1661 S Atherton St at IHOP
+159,Bigler Rd at Nittany Community Center
+160,Opposite 1031 E College Ave
+161,E College Ave at Your Building Center
+162,E College Ave at Squirrel Dr Outbound
+163,Walmart - Inbound
+164,Ross/Harbor Freight
+165,Nittany Mall Main Entrance
+169,E College Av at Hickeys
+170,E College Ave at Puddintown Rd
+171,1031 East College Ave at Hampton Inn
+212,W Whitehall Road at CATA
+246,W Beaver Ave at S Barnard St
+247,W College Ave at N Barnard St
+249,Colonnade Blvd at Home Goods
+250,Colonnade Blvd at Target/Dicks
+251,850 Toftrees Avenue - The View
+252,Colonnade Blvd Opposite Kohls
+253,Opposite 240 Toftrees Ave
+254,240 Toftrees Ave (Turtle Creek Apts)
+255,301 Toftrees Ave
+256,Opposite 301 Toftrees Ave
+257,359 Toftrees Ave (Parkgate Apartments)
+258,350 Toftrees Ave (Turtle Creek Apts)
+260,Cricklewood Dr at N Barkway Lane
+261,Cricklewood Dr at S Barkway Lane
+262,Cricklewood Dr at Wilts Lane Outbound
+263,Cricklewood Dr at Wilts Lane Inbound
+264,541 Cricklewood Dr
+265,711 Cricklewood Dr
+266,Opposite 711 Cricklewood Dr
+267,Cricklewood Dr at the American Ale House
+268,Cricklewood Dr at Cricklewood Apts
+269,Opposite 910 Cricklewood Dr
+270,910 Cricklewood Dr
+275,Cricklewood Dr at Cricklewood Circle
+277,Fox Hollow Rd at Orchard Rd Inbound
+278,Fox Hollow Rd at Orchard Rd Outbound
+279,Porter Rd at Beaver Stadium East
+280,Athletic Administration Building
+281,Porter Rd at Jordan East Parking
+282,Hastings Rd at Lot 43 East
+283,Hastings Rd at Forest Research Lab
+285,Walker Building
+287,Curtin Rd at Bryce Jordan Center
+288,W College Ave at N Sparks St
+289,W Beaver Ave at S Sparks St
+290,W College Ave at N Butz St
+291,W College Ave at Buckhout St & Haus
+292,W College Ave near Corl St
+293,W College Ave at Hoy St
+294,1445 W College Ave
+295,1400 W College Ave
+296,Opposite 1506 W College Ave
+297,1506 W College Ave
+304,W College Ave at Holly Circle Inbound
+305,W College Ave at Chelsea Lane Inbound
+306,W College Ave at Chelsea Lane Outbound
+307,W College Ave at Bristol Ave Inbound
+308,W College Ave at Bristol Ave Outbound
+310,Enterprise Dr at Bristol Ave
+312,Opposite 3035 Enterprise Dr
+313,3075 Enterprise Drive
+314,Enterprise Dr at Cato Ave
+315,Cato Ave at Enterprise Dr
+316,Cato Ave at Research Dr
+319,Toftrees Ave at Hillside and Fox Run
+320,Nittany Mall (Aldi)
+321,200 Shiloh Rd
+326,Toftrees Ave at Wildridge Apts.
+328,2601 E College Ave
+329,Waupelani Drive at OBryan Lane
+330,E College Ave at Struble Rd
+331,E College Ave at Nittany Commons
+332,E College Ave opp Nittany Commons
+333,E College Ave at Limerock Terrace
+334,Pike St at Limerock Terrace Inbound
+335,Pike St at Limerock Terrace Outbound
+336,Pike St at Hickory Lane Inbound
+337,Pike St at Hickory Lane Outbound
+338,542 Pike St
+339,537 Pike St
+340,Pike St at Dale St Outbound
+341,Pike St at Dale St Inbound
+342,Pike St at Mary St Inbound
+343,Pike St at Mary St Outbound
+344,Elmwood St at Elm St
+345,700 Elmwood St
+346,Elmwood St at Clover Rd
+347,Elmwood St at Hillview Ave
+348,200 Elmwood St
+349,201 Elmwood St
+355,Curtin Rd at Stadium West Parking Lot
+356,Curtin Rd at Visual Arts Building
+357,Pattee Transit Center Westbound
+358,Burrowes Rd at Rec Hall
+359,Burrowes Road at Westgate Building
+360,S Burrowes St at the James Elliott Bldg
+361,Beaver Ave at Schlow Library/CATA Office
+363,Opposite 240 S Pugh St
+364,240 S Pugh St (Days Inn)
+365,S Pugh St at E Nittany Ave
+366,S Pugh St at E Fairmount Ave
+367,S Pugh St at E Hamilton Ave Inbound
+368,S Pugh St at E Hamilton Ave Outbound
+369,S Pugh St at Waring Ave
+370,909 S Pugh St
+371,1015 S Pugh St
+372,1006 S Pugh St
+373,Easterly Pkwy at Old Boalsburg Rd
+374,S Atherton near S Allen Street
+375,1218 S Allen St
+376,S Pugh St at E Ellen Ave
+377,1248 S Atherton St (Citizens Bank)
+378,S Pugh St at Bradley Ave
+379,1306 S Atherton St
+380,S Atherton St at Norma Street
+381,S Atherton St at Whitehall Rd
+382,S Atherton St at Science St
+384,Easterly Pkwy at Manorway Apts
+386,Rolling Ridge Drive at Hills Plaza
+388,Rolling Ridge Dr at Hills Plaza South
+390,Opposite 501 Rolling Ridge Dr
+391,Windmere Dr at Wellington Dr
+393,Geisinger Medical Center at Scenery Park
+394,S Atherton St at W Beaver Ave Outbound
+395,S Atherton Street at Highland Alley
+396,S Atherton St at Fairmount Ave Outbound
+397,S Atherton St at W Fairmount Ave Inbound
+398,S. Atherton St. near Parkway Plaza Apts
+399,805 S Atherton St
+400,Research Drive at CATA
+401,S Atherton St at Centre Lane
+402,Waupelani Dr at S Allen St
+403,Waupelani Dr at The Retreat
+406,Waupelani Dr at Executive House
+407,Waupelani Dr at Lions Gate Apts
+408,445 Waupelani Dr (Nittany Gardens)
+409,450 Waupelani Dr (Hearthside)
+410,Waupelani Dr at Southgate Dr Inbound
+411,Waupelani Dr at Southgate Dr Outbound
+412,712 Southgate Dr
+413,Southgate Dr at Highlandon Ct
+414,Southgate Dr at Ashwicken Ct
+415,Southgate Dr at Blue Course Dr
+416,Stratford Dr at Blue Course Dr
+417,803 Stratford Dr
+418,Stratford Dr at Waupelani Dr
+420,N Atherton St at Arbor Way
+422,Blue Course Dr at BB&T Bank
+423,Northland Center Outbound
+424,Northland Center Inbound
+425,Blue Course Dr near Teaberry Lane
+426,Blue Course Dr at Blue Course Commons
+427,Havershire Blvd. at The Heights
+428,Havershire Blvd. across from The Heights
+429,Havershire Blvd. at Northwick (Inbound)
+430,Havershire Blvd. at Northwick (Outbound)
+431,Havershire Blvd. at Rushcliff (Outbound)
+432,Havershire Blvd. at Rushcliff (Inbound)
+433,Circleville Rd at Farmstead Lane Inbound
+434,Circleville Rd at Farmstead Ln Outbound
+435,Valley Vista Dr at State College Collect
+459,Galen Drive at Kenley Ct
+461,Amblewood Way at School Drive
+463,Mount Nittany Health Toftrees
+464,Galen Dr at Amblewood Way
+467,Carnegie Dr at Vista Lofts
+470,Valley Vista Drive at Lowes Center
+471,N Atherton St at Douglas Dr
+472,N Atherton St at Hawbaker Industrial Dr
+473,N Atherton St at Fairwood Lane
+474,N Atherton St near Fairfield Inn
+475,Colonnade Blvd at Chicos
+476,Colonnade Blvd at Wegmans
+477,Martin St at Park Crest Lane Inbound
+478,Martin St at Park Crest Lane Outbound
+479,1400 Martin St at Parkcrest Terrace
+480,Opposite 1400 Martin St
+481,Martin Street at Herman Drive
+482,1471 Martin St at Weis
+484,1521 Martin St at Northland Bowl
+485,Park Lane at Aaron Dr
+486,Park Lane at Devonshire Dr
+487,Park Lane at Cornwall Rd Inbound
+488,Park Lane at Cornwall Rd Outbound
+489,Park Lane at Sierra Lane
+490,Park Lane at Shannon Lane
+491,Park Lane at Park Forest Ave Inbound
+492,Park Lane at Park Forest Ave Outbound
+493,Park Forest Ave at Northbrook Greens
+494,Park Forest Ave Opposite Northbrook
+495,Park Forest Ave at N Atherton Outbound
+496,Park Forest Ave at N Atherton Inbound
+497,Trader Joes Plaza
+498,1870 North Atherton Street
+499,N Atherton St at Chick-Fil-A
+500,N Atherton St at Colonnade Blvd
+501,Middle of Oakwood Ave Outbound
+502,658 Oakwood Ave
+503,Vairo Blvd at Vairo Village (Upper)
+504,Vairo Blvd opposite Vairo Village(Upper)
+506,Vairo Blvd opposite Vairo Village(lower)
+507,Vairo Blvd at Vairo Village(lower)
+508,Vairo Blvd at Tremont Inbound(lower)
+509,Vairo Blvd at Tremont Inbound upper
+510,Vairo Blvd at Tremont Outbound
+511,Vairo Blvd at The Pointe Inbound
+512,Vairo Blvd at The Pointe Outbound
+513,Vairo Blvd at The Bryn Inbound
+516,Williamsburg Sq. - Holiday Inn/Spring Hi
+517,Oakwood Ave at Texas Roadhouse
+518,Middle of Oakwood Ave Inbound
+519,Oakwood Ave at Benjamin Ct
+520,North Atherton Place at Walmart
+521,North Atherton Place at McDonalds
+522,1611 North Atheron (Champs)
+523,1450 N Atherton St at Hoss
+524,N Atherton St at Denton Ave
+525,N Atherton St at N Hills Place Inbound
+526,N Atherton St at N Hills Place Outbound
+527,N Atherton St at E Clinton Ave
+538,W College Ave at Holly Circle Outbound
+549,Science Park Rd at Pine Hall Rd
+550,Science Park Rd at Torron Group
+551,301 Science Park Rd (ARL West IV)
+552,300 Science Park Rd (PSU Tech Support)
+553,385 Science Park Rd at Accuweather
+554,500 Science Park Rd at Davita
+557,Science Park Rd at Sandy Dr (Wonderland)
+563,University Drive ramp at The Meridian
+564,E Beaver Ave at Calder Commons
+565,E Beaver Ave at Beaver Hill Apts
+569,Porter Rd at Medlar Field
+572,EES Building WB
+624,1290 Circleville Rd
+625,1381 Circleville Road
+682,Circleville Rd at Knob Hill Pl
+700,Toftrees Avenue near Beaumanor Drive
+701,Toftrees Avenue near Alma Mater Drive
+703,Circleville Rd at W Park Hills Ave
+705,1612 N Atherton St (KBB Realtors)
+708,Circleville Rd at E Park Hills Ave
+709,972 Oakwood Ave
+710,Opposite 972 Oakwood Ave
+711,Circleville Rd opposite W Park Hills Ave
+714,Oakwood Ave at Vairo Village Comm Ctr
+715,545 Oakwood Ave at State College Collect
+718,Easterly Pkwy at Garner St
+732,Waupelani Dr. at Briarwood Apts
+745,Benner Pike at Barnes and Noble
+753,East College Ave at Green Acres Lane
+754,East College Avenue at Grandview Road
+755,Woodledge Dr Inbound (To Campus)
+756,Woodledge Dr Outbound (To Toftrees)
+761,Colonnade Blvd at Kohls
+768,3054 Enterprise Drive
+776,Martin St at Best Buy
+777,Waddle Rd at the Bryn
+778,Oakwood Ave at Clearview Ave
+779,Science Park Rd at Sandy Dr near CVIM
+780,Blue Course Dr at Blue Course Med Ctr
+788,Fox Hollow at Big Hollow
+789,Fox Hollow opp Big Hollow
+800,Fox Hollow opp Big Hollow
+809,East College Ave at Citi Clean
+813,Science Park Rd at the ARL Building
+824,Oakwood Ave at State College Collective
+832,Woodledge Dr at Woodledge Circle
+833,Woodledge Dr opposite Woodledge Circle
+839,Opposite 225 Science Park Rd (ARL Bldg)
+840,1700 Old Gatesburg Rd at Blue Course Med
+844,Woodledge Dr opposite Woodledge Circle
+848,Blue Course Dr near West College Ave
+849,1610 West College Ave (Waffle Shop)
+867,The Yards at Old State
+868,Blue Course Drive at Stratford Drive
+873,West Deck
+874,EES Building EB
+880,Sams Club
+882,Villas at Happy Valley
+935,Windmere Drive at Scenery Court
+936,501 Rolling Ridge Drive
+1001,Thon Dr.
+1002,513 Gerald St
+1011,East Marylyn Ave at Foxdale Village
+1012,E Mall Entrance on Shiloh Rd
+1013,Science St. at the Ramada
+2001,Westerly Pkwy at Plaza Dr
+2003,S Allen St near Riviera Apts
+2004,Easterly Pkwy at S Pugh St

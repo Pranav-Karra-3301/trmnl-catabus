@@ -1,0 +1,4 @@
+protobuf
+gtfs-realtime-bindings
+requests
+zoneinfo;python_version<"3.9" 

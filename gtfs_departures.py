@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""
+gtfs_departures.py
+Fetch a GTFS-Realtime (.ashx) feed, parse it, and show the next departures
+for a given stop.  Route and stop name look-ups are done via CSV files that
+live in ./public/  (route_map.csv, stop_map.csv).
+
+Output format:
+  HH:MM:SS | <route name> | trip <trip_id> | delay <seconds or n/a>
+"""
+
+import argparse
+import datetime as dt
+import logging
+import sys
+from pathlib import Path
+from typing import Dict, List
+
+# ---------- third-party deps ----------
+try:
+    import requests
+except ImportError:
+    requests = None  # we'll complain later
+
+try:
+    from google.transit import gtfs_realtime_pb2
+except ImportError:
+    print(
+        "Missing protobuf bindings.\n"
+        "Run:  pip install protobuf gtfs-realtime-bindings requests"
+    )
+    sys.exit(1)
+
+from zoneinfo import ZoneInfo
+
+# ---------- constants ----------
+PUBLIC_DIR = Path(__file__).resolve().parent / "public"
+ROUTE_CSV  = PUBLIC_DIR / "route_map.csv"
+STOP_CSV   = PUBLIC_DIR / "stop_map.csv"
+LOCAL_TZ   = ZoneInfo("America/New_York")
+
+# ---------- logging ----------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+# ---------- helpers ----------
+
+def fetch_blob(url: str, timeout: int = 10) -> bytes:
+    if not requests:
+        raise RuntimeError("The requests library is not installed.")
+    logging.info("Fetching GTFS feed: %s", url)
+    r = requests.get(url, timeout=timeout)
+    r.raise_for_status()
+    logging.info("✓ fetched %d bytes", len(r.content))
+    return r.content
+
+
+def parse_feed(blob: bytes):
+    feed = gtfs_realtime_pb2.FeedMessage()
+    feed.ParseFromString(blob)
+    logging.info(
+        "✓ parsed feed: version=%s ts=%s entities=%d",
+        feed.header.gtfs_realtime_version,
+        dt.datetime.fromtimestamp(feed.header.timestamp, LOCAL_TZ).isoformat(),
+        len(feed.entity),
+    )
+    return feed
+
+
+def load_mapping(path: Path) -> Dict[str, str]:
+    import csv
+
+    if not path.is_file():
+        logging.warning("Mapping file not found: %s (IDs will be shown raw)", path)
+        return {}
+    with path.open(newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        mapping = {row[0].strip(): row[1].strip() for row in reader if row and not row[0].startswith("#")}
+    logging.info("✓ loaded %d rows from %s", len(mapping), path.name)
+    return mapping
+
+
+def extract_departures(feed, stop_id: str, top_n: int = 8) -> List[dict]:
+    deps: List[dict] = []
+    for ent in feed.entity:
+        if ent.HasField("trip_update"):
+            tu = ent.trip_update
+            for stu in tu.stop_time_update:
+                if stu.stop_id == stop_id and stu.departure.time:
+                    deps.append(
+                        {
+                            "trip_id": tu.trip.trip_id,
+                            "route_id": tu.trip.route_id,
+                            "ts": stu.departure.time,
+                            "delay": stu.departure.delay if stu.departure.HasField("delay") else None,
+                        }
+                    )
+    deps.sort(key=lambda d: d["ts"])
+    return deps[:top_n]
+
+
+# ---------- CLI ----------
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Show upcoming departures for a stop.")
+    p.add_argument("url", help="URL of the .ashx GTFS-Realtime feed")
+    p.add_argument("stop_id", help="Stop ID (e.g. 54)")
+    p.add_argument("-n", "--number", type=int, default=8, help="How many departures to list (default 8)")
+    args = p.parse_args()
+
+    try:
+        blob  = fetch_blob(args.url)
+        feed  = parse_feed(blob)
+    except Exception as e:
+        logging.error("FAILED: %s", e, exc_info=True)
+        sys.exit(1)
+
+    departures = extract_departures(feed, args.stop_id, args.number)
+    if not departures:
+        print(f"No departures found for stop {args.stop_id}.")
+        return
+
+    # load mappings once
+    route_map = load_mapping(ROUTE_CSV)
+    stop_map  = load_mapping(STOP_CSV)
+
+    stop_name = stop_map.get(args.stop_id, f"Stop {args.stop_id}")
+    print(f"Next {len(departures)} departures at {stop_name}:")
+
+    for d in departures:
+        time_str = dt.datetime.fromtimestamp(d["ts"], LOCAL_TZ).strftime("%H:%M:%S")
+        route    = route_map.get(d["route_id"], d["route_id"])
+        delay    = f"{d['delay']} s" if d["delay"] is not None else "n/a"
+        print(f" {time_str} | {route} | trip {d['trip_id']} | delay {delay}")
+
+
+if __name__ == "__main__":
+    main() 
