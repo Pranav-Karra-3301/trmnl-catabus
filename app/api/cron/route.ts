@@ -1,9 +1,20 @@
 import { fetchFeed } from '@/lib/cata';
 import kv from '@/lib/kv';
+import { NextRequest } from 'next/server';
 
-export const config = { runtime: 'edge' };
+export async function GET(request: NextRequest) {
+  // Verify cron authorization (Railway will set this)
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    console.warn('[cron] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-export async function GET() {
   const start = Date.now();
   try {
     console.log('[cron] Fetching latest CATA feed');
@@ -56,4 +67,8 @@ export async function GET() {
       headers: { 'Content-Type': 'application/json' },
     });
   }
+}
+
+export async function POST(request: NextRequest) {
+  return GET(request);
 }

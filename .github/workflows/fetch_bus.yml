@@ -9,25 +9,11 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
 
-    env:
-      REDIS_URL: ${{ secrets.REDIS_URL }}
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: Set up Python 3.x
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
+      - name: Trigger Railway cron endpoint
         run: |
-          pip install protobuf gtfs-realtime-bindings requests redis
-
-      - name: Fetch and push departures
-        # Fetch all stops and push to Redis
-        run: |
-          python gtfs_departures.py https://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate --all
+          curl -X POST ${{ secrets.RAILWAY_APP_URL }}/api/cron \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -w "HTTP Status: %{http_code}\n" \
+            -s

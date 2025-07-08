@@ -4,11 +4,11 @@ A fully-working microservice that fetches CATA's GTFS-RT (General Transit Feed S
 
 ## Features
 
-- **Real-time Data**: Fetches CATA's GTFS-RT feed every 60 seconds via cron
-- **Smart Caching**: In-memory Map caching with Edge Config read fallback
-- **Edge Runtime**: All functions run on Vercel's Edge Runtime for optimal performance
+- **Real-time Data**: Fetches CATA's GTFS-RT feed every 5 minutes via cron
+- **Redis Caching**: Fast Redis-based caching for optimal performance
+- **Railway Deployment**: Deployed on Railway with full Node.js support
 - **REST API**: Simple JSON API to get departure times for any stop
-- **Debugging**: Endpoint to list all cached stop IDs
+- **Health Monitoring**: Health check endpoint for monitoring
 - **TypeScript**: Fully typed with strict TypeScript
 - **Testing**: Jest unit tests for core functionality
 
@@ -16,8 +16,8 @@ A fully-working microservice that fetches CATA's GTFS-RT (General Transit Feed S
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   CATA GTFS-RT  │───▶│  Cron Handler   │───▶│  MapCache Only  │
-│   Protobuf Feed │    │  /api/cron      │    │  (In-Memory)    │
+│   CATA GTFS-RT  │───▶│  Cron Handler   │───▶│  Redis Cache    │
+│   Protobuf Feed │    │  /api/cron      │    │  (Railway)      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
                                                         │
 ┌─────────────────┐    ┌─────────────────┐              │
@@ -31,7 +31,30 @@ A fully-working microservice that fetches CATA's GTFS-RT (General Transit Feed S
 └─────────────────┘    └─────────────────┘
 ```
 
+## Railway Deployment
+
+This application is optimized for Railway deployment with:
+- **Full Node.js Runtime**: No Edge Runtime limitations
+- **Integrated Redis**: Automatic Redis provisioning
+- **Cron Jobs**: External cron via GitHub Actions
+- **Health Checks**: Built-in health monitoring
+
+See [RAILWAY_DEPLOYMENT.md](RAILWAY_DEPLOYMENT.md) for detailed deployment instructions.
+
 ## API Endpoints
+
+### GET /api/health
+
+Health check endpoint for monitoring.
+
+**Response** (200 OK):
+```json
+{
+  "status": "healthy",
+  "timestamp": "2023-12-01T12:00:00.000Z",
+  "service": "trmnl-catabus"
+}
+```
 
 ### GET /api/stop/[id]
 
@@ -40,14 +63,16 @@ Returns departure times for a specific stop ID.
 **Response** (200 OK):
 ```json
 {
-  "updatedAt": 1703123456789,
+  "updatedAt": "2023-12-01T12:00:00.000Z",
   "departures": [
     {
-      "routeId": "ROUTE1",
-      "routeShortName": "ROUTE1", 
-      "tripId": "trip_123",
-      "stopId": "STOP1",
-      "scheduledTime": 1703123456789,
+      "route": "72",
+      "headsign": "Downtown",
+      "time": "2023-12-01T12:15:00-05:00",
+      "status": "on-time"
+    }
+  ]
+}
       "predictedTime": 1703123516789,
       "delay": 60,
       "vehicleId": "vehicle_456"

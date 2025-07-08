@@ -1,7 +1,5 @@
 import kv from '@/lib/kv';
 
-export const config = { runtime: 'edge' };
-
 export async function GET() {
   try {
     // Check if Redis URL is configured
