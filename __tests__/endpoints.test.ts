@@ -44,13 +44,13 @@ describe('API endpoints integration', () => {
     expect(stopsJson).toEqual(expect.arrayContaining(['72', '99']));
 
     // 3. valid stop id
-    const stopValid = await stopGET({} as any, { params: { id: '72' } });
+    const stopValid = await stopGET({} as any, { params: Promise.resolve({ id: '72' }) });
     expect(stopValid.status).toBe(200);
     const payload = JSON.parse(await stopValid.text());
     expect(payload.departures).toHaveLength(1);
 
     // 4. invalid stop id
-    const stopInvalid = await stopGET({} as any, { params: { id: '000' } });
+    const stopInvalid = await stopGET({} as any, { params: Promise.resolve({ id: '000' }) });
     expect(stopInvalid.status).toBe(503);
   });
 }); 

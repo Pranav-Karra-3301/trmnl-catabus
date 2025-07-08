@@ -4,9 +4,9 @@ export const config = { runtime: 'edge' };
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const stopId = params.id;
+  const { id: stopId } = await params;
   console.log('[stop-api] requested id:', stopId);
 
   if (!stopId) {

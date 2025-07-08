@@ -14,11 +14,13 @@ function toNumber(value: number | { low: number } | undefined | null): number {
 /**
  * Parse a GTFS-Realtime `FeedMessage` into the departure shape we expose.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseProtobufFeed(feed: any): Map<string, Departure[]> {
   const byStop = new Map<string, Departure[]>();
   const now = Date.now();
 
-  for (const entity of feed.entity as any[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const entity of (feed.entity as any[])) {
     if (!entity.tripUpdate) continue;
     const tripUpdate = entity.tripUpdate;
     const trip = tripUpdate.trip;
@@ -73,6 +75,7 @@ function parseXmlFeed(xml: string): Map<string, Departure[]> {
 
   // CATA's XML structure isn’t publicly documented; we do a best-effort scan
   // for objects that look like GTFS-RT stop updates.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updates: any[] = json?.TripUpdates?.TripUpdate ?? [];
   const now = Date.now();
 
@@ -139,7 +142,7 @@ export async function fetchFeed(): Promise<Map<string, Departure[]>> {
       new Uint8Array(buffer)
     );
     return parseProtobufFeed(feed);
-  } catch (err) {
+  } catch {
     console.warn('[fetchFeed] Protobuf parsing failed – attempting XML fallback');
   }
 
@@ -152,7 +155,7 @@ export async function fetchFeed(): Promise<Map<string, Departure[]>> {
     }
     const xmlText = await xmlRes.text();
     return parseXmlFeed(xmlText);
-  } catch (err) {
+  } catch {
     console.error('[fetchFeed] XML parsing also failed');
     throw new Error('Failed to fetch and parse CATA real-time feed');
   }
