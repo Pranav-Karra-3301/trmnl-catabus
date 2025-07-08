@@ -116,15 +116,16 @@ function parseXmlFeed(xml: string): Map<string, Departure[]> {
   return byStop;
 }
 
+// Publicly available CATA real-time feed URL (GTFS-RT TripUpdate).
+const CATA_RT_URL =
+  'http://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate';
+
 /**
  * Fetch CATA's real-time feed, attempting protobuf first with an XML fallback.
  * Returns a map keyed by `stopId`.
  */
 export async function fetchFeed(): Promise<Map<string, Departure[]>> {
-  const url = process.env.CATA_RT_URL;
-  if (!url) {
-    throw new Error('CATA_RT_URL environment variable is not set');
-  }
+  const url = CATA_RT_URL;
 
   // ----- 1. Protobuf attempt -------------------------------------------------
   try {

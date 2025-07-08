@@ -55,8 +55,6 @@ describe('CATA Parser', () => {
       text: () => Promise.resolve('<xml></xml>'),
     });
 
-    process.env.CATA_RT_URL = 'https://example.com/gtfs-rt';
-
     const map = await fetchFeed();
 
     expect(map.get('STOP1')).toBeDefined();
@@ -68,13 +66,6 @@ describe('CATA Parser', () => {
   skipOnEdge('should handle fetch errors', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 });
 
-    process.env.CATA_RT_URL = 'https://example.com/gtfs-rt';
-
     await expect(fetchFeed()).rejects.toThrow();
-  });
-
-  skipOnEdge('should throw error when URL is missing', async () => {
-    delete process.env.CATA_RT_URL;
-    await expect(fetchFeed()).rejects.toThrow('CATA_RT_URL environment variable is not set');
   });
 }); 
