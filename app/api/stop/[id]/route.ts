@@ -10,10 +10,11 @@ export async function GET(
   console.log(`[stop] Fetching data for stop ${stopId}`);
 
   try {
+    console.log(`[stop] Attempting to get data for stop ${stopId}`);
     const json = await kv.get(`stop:${stopId}`);
     console.log(`[stop] Got data for stop ${stopId}:`, json ? 'found' : 'not found');
 
-    if (json === undefined) {
+    if (json === null || json === undefined) {
       return new Response(JSON.stringify({ error: 'no-data' }), {
         status: 503,
         headers: {
