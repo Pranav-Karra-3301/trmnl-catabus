@@ -12,6 +12,7 @@ Output format:
 import argparse
 import datetime as dt
 import logging
+import os  # new dependency for REDIS_URL environment variable
 import sys
 from pathlib import Path
 from typing import Dict, List
@@ -100,6 +101,28 @@ def extract_departures(feed, stop_id: str, top_n: int = 8) -> List[dict]:
     deps.sort(key=lambda d: d["ts"])
     return deps[:top_n]
 
+# ---------- redis helper ----------
+
+# The Python runtime on Vercel (and locally) exposes the Upstash Redis REST URL via the
+# REDIS_URL environment variable. We push the departures list under the key `stop:<id>`
+# using a simple HTTP PUT request.
+
+def push_to_redis(stop_id: str, departures: List[dict], redis_url: str) -> None:
+    """Push departure payload to Redis. Logs success/failure. Raises on HTTP errors."""
+    if not requests:
+        logging.warning("The requests library is not installed; skipping Redis push.")
+        return
+
+    key_url = f"{redis_url.rstrip('/')}/stop:{stop_id}"
+    payload = {
+        "updatedAt": dt.datetime.utcnow().isoformat() + "Z",
+        "departures": departures,
+    }
+
+    logging.info("PUT %s (len=%d)", key_url, len(departures))
+    r = requests.put(key_url, json=payload, timeout=10)
+    r.raise_for_status()
+    logging.info("✓ Redis push successful: status=%s", r.status_code)
 
 # ---------- CLI ----------
 
@@ -118,6 +141,17 @@ def main() -> None:
         sys.exit(1)
 
     departures = extract_departures(feed, args.stop_id, args.number)
+
+    # Attempt to push results to Redis, if a URL is configured.
+    redis_url = os.environ.get("REDIS_URL")
+    if redis_url:
+        try:
+            push_to_redis(args.stop_id, departures, redis_url)
+        except Exception as e:
+            logging.error("Redis push failed: %s", e, exc_info=True)
+    else:
+        logging.warning("REDIS_URL not set; skipping Redis push")
+
     if not departures:
         print(f"No departures found for stop {args.stop_id}.")
         return
