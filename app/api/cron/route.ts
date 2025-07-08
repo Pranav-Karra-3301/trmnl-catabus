@@ -1,5 +1,5 @@
 import { fetchFeed } from '@/lib/cata';
-import { writeItems } from '@/lib/edge-config';
+import { upsert } from '@/lib/edge-config';
 
 export const config = { runtime: 'edge' };
 
@@ -21,9 +21,9 @@ export async function GET() {
       });
     }
 
-    await writeItems(items);
+    await upsert(items);
 
-    console.log('[cron] wrote stops to Edge Config:', items.length);
+    console.log('cron wrote', items.length, 'stops');
     console.log(`[cron] Completed in ${Date.now() - start}ms`);
 
     return new Response(null, { status: 204 });

@@ -13,8 +13,8 @@
   "dependencies": {
     "@vercel/edge-config": "^1.4.0",
     "dotenv": "^17.0.1",
-    "gtfs-realtime-bindings": "^1.1.1",
     "fast-xml-parser": "^4.4.2",
+    "gtfs-realtime-bindings": "^1.1.1",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

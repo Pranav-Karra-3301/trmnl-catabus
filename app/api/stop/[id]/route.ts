@@ -4,42 +4,22 @@ export const config = { runtime: 'edge' };
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id: stopId } = await params;
-  console.log('[stop-api] requested id:', stopId);
+  const { id: stopId } = params;
+  const json = await get(`stop:${stopId}`);
 
-  if (!stopId) {
-    return new Response(
-      JSON.stringify({ error: 'missing-stop-id' }),
-      {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
-        },
-      }
-    );
+  if (json === undefined) {
+    return new Response(JSON.stringify({ error: 'no-data' }), {
+      status: 503,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
+      },
+    });
   }
 
-  const raw = await get(`stop:${stopId}`);
-  if (raw === undefined) {
-    return new Response(
-      JSON.stringify({ error: 'no-data' }),
-      {
-        status: 503,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=60, stale-while-revalidate=30',
-        },
-      }
-    );
-  }
-
-  const str = raw as string;
-  const obj = JSON.parse(str);
-  console.log('[stop-api] returning payload bytes:', str.length);
-  return new Response(JSON.stringify(obj), {
+  return new Response(JSON.stringify(json), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
