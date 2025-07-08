@@ -1,16 +1,10 @@
-import { mapCache } from '@/lib/cache';
+import { cache } from '@/lib/cache';
 
 export const config = { runtime: 'edge' };
 
 export async function GET() {
   try {
-    const allKeys = mapCache.getAllKeys();
-    
-    // Extract stop IDs from keys (remove "stop:" prefix)
-    const stopIds = allKeys
-      .filter(key => key.startsWith('stop:'))
-      .map(key => key.replace('stop:', ''))
-      .sort();
+    const stopIds = cache.getAllStopIds().sort();
 
     return new Response(JSON.stringify(stopIds), {
       status: 200,

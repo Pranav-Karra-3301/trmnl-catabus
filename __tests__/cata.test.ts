@@ -1,4 +1,5 @@
-import { fetchAndParse } from '@/lib/cata';
+import { fetchFeed } from '@/lib/cata';
+import type { Departure } from '@/lib/types';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -49,35 +50,31 @@ describe('CATA Parser', () => {
   skipOnEdge('should parse GTFS-RT feed correctly', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0))
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      // dummy text for xml fallback (unused)
+      text: () => Promise.resolve('<xml></xml>'),
     });
 
-    const result = await fetchAndParse('https://example.com/gtfs-rt');
+    process.env.CATA_RT_URL = 'https://example.com/gtfs-rt';
 
-    expect(result).toBeDefined();
-    expect(result['STOP1']).toBeDefined();
-    expect(result['STOP1']).toHaveLength(1);
-    expect(result['STOP1'][0]).toMatchObject({
-      routeId: 'ROUTE1',
-      tripId: 'trip_123',
-      stopId: 'STOP1',
-      vehicleId: 'vehicle_456'
-    });
+    const map = await fetchFeed();
+
+    expect(map.get('STOP1')).toBeDefined();
+    const departures = map.get('STOP1') as Departure[];
+    expect(departures).toHaveLength(1);
+    expect(departures[0]).toMatchObject({ route: 'ROUTE1' });
   });
 
   skipOnEdge('should handle fetch errors', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error'
-    });
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 });
 
-    await expect(fetchAndParse('https://example.com/gtfs-rt')).rejects.toThrow(
-      'Failed to fetch GTFS-RT feed: 500 Internal Server Error'
-    );
+    process.env.CATA_RT_URL = 'https://example.com/gtfs-rt';
+
+    await expect(fetchFeed()).rejects.toThrow();
   });
 
   skipOnEdge('should throw error when URL is missing', async () => {
-    await expect(fetchAndParse('')).rejects.toThrow('CATA realtime URL is not configured');
+    delete process.env.CATA_RT_URL;
+    await expect(fetchFeed()).rejects.toThrow('CATA_RT_URL environment variable is not set');
   });
 }); 

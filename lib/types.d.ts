@@ -1,30 +1,20 @@
 export interface Departure {
-  routeId: string;
-  routeShortName: string;
-  tripId: string;
-  stopId: string;
-  scheduledTime: number; // Unix timestamp
-  predictedTime: number; // Unix timestamp
-  delay: number; // seconds
-  vehicleId?: string;
+  /** Short name or identifier of the route */
+  route: string;
+  /** Vehicle headsign / destination */
+  headsign: string;
+  /** ISO‐8601 timestamp when the vehicle is expected to depart */
+  time: string;
+  /** Simple status label e.g. `on-time`, `delayed`, `early` */
+  status: string;
 }
 
-export interface ParsedFeed {
-  updatedAt: number; // Unix timestamp
-  departures: Record<string, Departure[]>; // stopId -> departures
-}
-
-export interface StopResponse {
-  updatedAt: number;
+export interface StopPayload {
+  updatedAt: string;
   departures: Departure[];
 }
 
 export interface ErrorResponse {
   error: string;
   message?: string;
-}
-
-export interface CacheEntry {
-  updatedAt: number;
-  data: Departure[];
 } 
