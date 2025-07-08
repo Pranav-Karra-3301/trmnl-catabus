@@ -48,4 +48,4 @@ export async function upsert(items: { key: string; value: unknown }[]) {
   }
 }
 
-export { get, getAll }; 
+export { get, getAll };
