@@ -9,7 +9,7 @@ function toLong(value: number | { low: number } | undefined | null): number {
 
 export async function fetchAndParse(url: string): Promise<Record<string, Departure[]>> {
   if (!url) {
-    throw new Error('CATA_RT_URL is not configured');
+    throw new Error('CATA realtime URL is not configured');
   }
 
   console.log('Fetching GTFS-RT feed from:', url);

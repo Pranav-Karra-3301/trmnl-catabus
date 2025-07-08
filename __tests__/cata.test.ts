@@ -78,6 +78,6 @@ describe('CATA Parser', () => {
   });
 
   skipOnEdge('should throw error when URL is missing', async () => {
-    await expect(fetchAndParse('')).rejects.toThrow('CATA_RT_URL is not configured');
+    await expect(fetchAndParse('')).rejects.toThrow('CATA realtime URL is not configured');
   });
 }); 

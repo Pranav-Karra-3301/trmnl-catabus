@@ -5,11 +5,15 @@ export const config = { runtime: 'edge' };
 
 export async function GET() {
   try {
-    const cataRtUrl = process.env.CATA_RT_URL;
-    if (!cataRtUrl) {
-      console.error('CATA_RT_URL environment variable is not set');
-      return new Response('CATA_RT_URL not configured', { status: 500 });
+    const cataRtBase = process.env.CATA_RT_BASE;
+    const cataRtType = process.env.CATA_RT_TYPE;
+    
+    if (!cataRtBase || !cataRtType) {
+      console.error('CATA_RT_BASE and CATA_RT_TYPE environment variables must be set');
+      return new Response('CATA_RT_BASE and CATA_RT_TYPE not configured', { status: 500 });
     }
+    
+    const cataRtUrl = `${cataRtBase}?Type=${cataRtType}`;
 
     console.log('Starting GTFS-RT feed fetch and parse...');
     const startTime = Date.now();

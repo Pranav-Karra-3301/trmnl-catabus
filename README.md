@@ -82,8 +82,9 @@ Internal cron endpoint that fetches and caches GTFS-RT data. Returns 204 No Cont
 Create a `.env.local` file with:
 
 ```bash
-# Required: CATA GTFS-RT feed URL
-CATA_RT_URL=https://your-cata-gtfs-rt-url
+# Required: CATA GTFS-RT feed base URL and query parameter
+CATA_RT_BASE=http://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx
+CATA_RT_TYPE=TripUpdate
 
 # Optional: Vercel Edge Config (for read-only fallback)
 EDGE_CONFIG_ID=your_edge_config_id
@@ -100,7 +101,7 @@ EDGE_CONFIG_TOKEN=your_edge_config_token
 2. **Set up environment variables**:
    ```bash
    cp .env.example .env.local
-   # Edit .env.local with your CATA_RT_URL
+   # Edit .env.local with your CATA_RT_BASE and CATA_RT_TYPE
    ```
 
 3. **Run development server**:
