@@ -89,6 +89,45 @@ def load_mapping(path: Path) -> Dict[str, str]:
     return mapping
 
 
+def extract_departures(feed, stop_id: str, top_n: int = 8) -> List[dict]:
+    """Extract departures for a single stop from the feed."""
+    deps: List[dict] = []
+    now_ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
+    
+    for ent in feed.entity:
+        if ent.HasField("trip_update"):
+            tu = ent.trip_update
+            trip = tu.trip
+            route_id = trip.route_id or "??"
+            headsign = trip.trip_id or "Unknown"
+            
+            for stu in tu.stop_time_update:
+                if stu.stop_id == stop_id and stu.departure.time:
+                    scheduled_ms = stu.departure.time * 1000
+                    delay_s = stu.departure.delay if stu.departure.HasField("delay") else 0
+                    predicted_ms = scheduled_ms + delay_s * 1000
+                    
+                    # Filter out clearly outdated/far-future departures
+                    if predicted_ms < now_ms - 60_000:  # >1 min in the past
+                        continue
+                    if predicted_ms > now_ms + 2 * 60 * 60 * 1000:  # >2h ahead
+                        continue
+                    
+                    status = (
+                        "delayed" if delay_s > 90 else "early" if delay_s < -90 else "on-time"
+                    )
+                    
+                    deps.append({
+                        "route": route_id,
+                        "headsign": headsign,
+                        "time": dt.datetime.fromtimestamp(predicted_ms / 1000, LOCAL_TZ).isoformat(),
+                        "status": status,
+                    })
+    
+    deps.sort(key=lambda d: d["time"])
+    return deps[:top_n]
+
+
 def extract_all_departures(feed, top_n: int = 10) -> Dict[str, List[dict]]:
     """Extract departures for all stops from the feed."""
     per_stop: Dict[str, List[dict]] = {}
@@ -285,4 +324,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main() 
+    main()
