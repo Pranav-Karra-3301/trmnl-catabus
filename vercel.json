@@ -1,4 +1,16 @@
 {
+  "builds": [
+    {
+      "src": "gtfs_departures.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/gtfs-departures",
+      "dest": "gtfs_departures.py"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron.py",
