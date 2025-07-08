@@ -1,0 +1,33 @@
+name: Fetch CATA departures
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'    # every 5 minutes
+  workflow_dispatch:        # manual trigger
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    env:
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install protobuf gtfs-realtime-bindings requests
+
+      - name: Fetch and push departures
+        # Note: gtfs_departures.py now pushes directly to Vercel KV via REST
+        run: |
+          python gtfs_departures.py https://realtime.catabus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate 54 --number 8
