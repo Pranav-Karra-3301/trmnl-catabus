@@ -23,7 +23,7 @@ const kv = {
     }
   },
 
-  async set(key: string, value: any) {
+  async set(key: string, value: unknown) {
     try {
       await client.set(key, JSON.stringify(value));
       return 'OK';
