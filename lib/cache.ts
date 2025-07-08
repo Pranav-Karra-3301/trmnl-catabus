@@ -33,7 +33,21 @@ export class MapCache {
   }
 
   getAllKeys(): string[] {
-    return Array.from(this.cache.keys());
+    const now = Date.now();
+    const activeKeys: string[] = [];
+    
+    // Clean up expired entries and collect active keys
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.updatedAt > 5 * 60 * 1000) {
+        // Delete expired entry
+        this.cache.delete(key);
+      } else {
+        // Keep active entry
+        activeKeys.push(key);
+      }
+    }
+    
+    return activeKeys;
   }
 }
 
